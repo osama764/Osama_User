@@ -1,7 +1,7 @@
 const updateDeviceAsync = async (body) => {
   try {
     const response = await fetch(
-      "https://smart-home-service.onrender.com/api/devices",
+      "https://osama-user.onrender.com/api/devices",
       {
         method: "PATCH",
         headers: {
