@@ -46,104 +46,6 @@ let selectImage = document.querySelector(".selectImage"); // button
 let closeImages = document.querySelector("#closeImages"); //close
 
 
-
-
-
-
-
-
-let DifferentDevice = document.getElementById("DifferentDevice");
-let addDefferentDevice = document.querySelector(".addDefferentDevice");
-
-addDefferentDevice.addEventListener("click", () => {
-  // close form after adding new device
-  contentDevices.style.transform = "scale(0)";
-
-  // Call data from realtime
-  let roomsRef = firebase.database().ref("Rooms");
-  // if checkbox not Checked ====> : Normal device without bushing
-  if (DifferentDevice.value != "") {
-    if (!containPushButtons.checked) {
-      roomsRef
-        .orderByChild("Name")
-        .equalTo(currentName)
-        .once("value")
-        .then((snapshot) => {
-          snapshot.forEach((childSnapshot) => {
-            const devicesArray = childSnapshot.val().devices || [];
-            const newDevice = {
-              Name: DifferentDevice.value,
-              status: 0,
-              nameImage: selectImg.value,
-            
-          
-            };
-            const deviceExists = devicesArray.some(
-              (device) => device.Name === newDevice.Name
-            );
-            if (deviceExists) {
-    
-              alert("This device already exists");
-            } else {
-              devicesArray.push(newDevice);
-              childSnapshot.ref.update({ devices: devicesArray }).then(() => {
-                console.log("تم إضافة الجهاز بنجاح!");
-                DifferentDevice.value=""
-                selectImg.value=""
-
-              });
-            }
-          });
-        })
-        .catch((error) => {
-          console.error("حدث خطأ أثناء إضافة الجهاز الجديد:", error);
-        });
-    } else {
-      roomsRef
-        .orderByChild("Name")
-        .equalTo(currentName)
-        .once("value")
-        .then((snapshot) => {
-          snapshot.forEach((childSnapshot) => {
-            const devicesArray = childSnapshot.val().devicesPush || [];
-            const newDevice = {
-              Name: "Push" + DifferentDevice.value,
-              status: 0,
-              nameImage: selectImg.value,
-          
-            };
-            const deviceExists = devicesArray.some(
-              (device) => device.Name === newDevice.Name
-            );
-            if (deviceExists) {
-
-              alert("This device already exists");
-            } else {
-              devicesArray.push(newDevice);
-              childSnapshot.ref
-                .update({ devicesPush: devicesArray })
-                .then(() => {
-                  console.log("تم إضافة الجهاز بنجاح!");
-                  DifferentDevice.value=""
-                  selectImg.value=""
-      
-                });
-            }
-          });
-        })
-        .catch((error) => {
-          console.error("حدث خطأ أثناء إضافة الجهاز الجديد:", error);
-        });
-    }
-  } else {
-    alert("Enter Name of Device");
-  }
-
-
-});
-
-
-
 function DisplayDevices() {
   const roomsRef = firebase.database().ref("Rooms");
   roomsRef
@@ -194,7 +96,9 @@ function DisplayDevices() {
               // Get the name of the device
               const deviceName = devicesArray[deviceIndex].Name;
               const imageName = devicesArray[deviceIndex].nameImage;
+              const typeDevice = devicesArray[deviceIndex].type;
 
+              const newtype = typeDevice; 
               const newImage = imageName;
               const newName = deviceName; 
               const nameOfArray = "devices"; 
@@ -205,7 +109,8 @@ function DisplayDevices() {
                 newStatus,
                 newName,
                 nameOfArray,
-                newImage
+                newImage,
+                newtype
               );
             }
           });
@@ -287,6 +192,7 @@ function DisplayPushDevices() {
             if (deviceIndex >= 0 && deviceIndex < devicesArray.length) {
               const deviceName = devicesArray[deviceIndex].Name;
               const imageName = devicesArray[deviceIndex].nameImage;
+              
               const newImage = imageName;
               const newName = deviceName;
               const nameOfArray = "devicesPush";
@@ -529,12 +435,14 @@ function updateStateDevice(
   currentStatus,
   NewName,
   NameOfArray,
-  newImage
+  newImage,
+  newtype
 ) {
   var data = {
     status: currentStatus,
     Name: NewName,
     nameImage: newImage,
+    type:newtype
   };
 
   $.ajax({
